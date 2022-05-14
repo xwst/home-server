@@ -1,0 +1,34 @@
+---
+version: "2.1"
+services:
+  swag:
+    image: ghcr.io/linuxserver/swag
+    container_name: swag
+    cap_add:
+      - NET_ADMIN
+    environment:
+      - PUID=${PUID?PUID is not known!}
+      - PGID=${PGID?PGID is not known!}
+      - TZ=${TIMEZONE?No timezone specified!}
+      - URL=mydomain.tld
+        # - SUBDOMAINS=www,
+        # - EXTRA_DOMAINS=
+      - VALIDATION=http
+      - STAGING=true  # change to 'false' when going to production
+    volumes:
+      - /opt/docker/home-server/swag:/config
+    ports:
+      - 443:443
+      - 80:80
+    restart: unless-stopped
+  nextcloud:
+    image: ghcr.io/linuxserver/nextcloud
+    container_name: nextcloud
+    environment:
+      - PUID=${PUID?PUID is not known!}
+      - PGID=${PGID?PGID is not known!}
+      - TZ=${TIMEZONE?No timezone specified!}
+    volumes:
+      - /opt/docker/home-server/nextcloud/config:/config
+      - /opt/docker/home-server/nextcloud/data:/data
+    restart: unless-stopped
