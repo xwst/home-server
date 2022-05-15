@@ -10,11 +10,11 @@ services:
       - PUID=${PUID?PUID is not known!}
       - PGID=${PGID?PGID is not known!}
       - TZ=${TIMEZONE?No timezone specified!}
-      - URL=mydomain.tld
+      - URL=${MYDOMAIN?No domain specified!}
         # - SUBDOMAINS=www,
         # - EXTRA_DOMAINS=
       - VALIDATION=http
-      - STAGING=true  # change to 'false' when going to production
+      - STAGING=true  # change to 'false' for use in production
     volumes:
       - /opt/docker/home-server/swag:/config
     ports:
