@@ -51,15 +51,40 @@ echo "DB_NEXTCLOUD_PW=$(pw 20)" >> .env
 echo "Starting server to continue with configuration." | ww
 docker-compose up -d
 
+echo -n "Waiting for bind-mounts to be ready." | ww
+PROXY_CONF=$BASE_DIR/swag/nginx/proxy-confs/nextcloud.subfolder.conf
+NC_CONF=$BASE_DIR/nextcloud/config/www/nextcloud/config/config.php
+while [ ! -f "$PROXY_CONF.sample" ]; do
+    sleep 3;
+    echo -n "."
+done
+echo ""
+
+
+# Enable reverse proxy for nextcloud:
 mv $BASE_DIR/swag/nginx/proxy-confs/nextcloud.subfolder.conf.sample \
    $BASE_DIR/swag/nginx/proxy-confs/nextcloud.subfolder.conf
-CONF=$BASE_DIR/nextcloud/config/www/nextcloud/config/config.php 
-head -n -1 $CONF > tmp.conf
+docker-compose restart swag
+
+echo -n "Waiting for nextcloud to perform initial configuration." | ww
+while [ ! -f "$NC_CONF" ]; do
+    sleep 5
+    echo -n "."
+    # Load nextcloud to let nextcloud generate the initial config-files
+    curl -s https://$domain/nextcloud
+done
+echo ""
+sleep 5
+
+
+# Adjust nextcloud settings:
+grep -v "^$" $NC_CONF | head -n -1 > tmp.conf
 echo "  'trusted_proxies' => ['swag']," >> tmp.conf
 echo "  'overwritewebroot' => '/nextcloud'," >> tmp.conf
 echo "  'overwrite.cli.url' => 'https://$domain/nextcloud'" >> tmp.conf
-tail -n 1 $CONF >> tmp.conf
-mv tmp.conf $CONF
+grep -v "^$" $NC_CONF | tail -n 1 >> tmp.conf
+mv tmp.conf $NC_CONF
+chown $uid:$gid $NC_CONF
 
 
 echo "Configuration complete, stopping server." | ww
