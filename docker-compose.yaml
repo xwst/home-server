@@ -30,5 +30,21 @@ services:
       - TZ=${TIMEZONE?No timezone specified!}
     volumes:
       - ${BASE_DIR?Base directory not specified!}/nextcloud/config:/config
-      - ${BASE_DIR?Base directory not specified!}/nextcloud/data:/config
+      - ${BASE_DIR?Base directory not specified!}/nextcloud/data:/data
+    depends_on:
+      - mariadb
+    restart: unless-stopped
+  mariadb:
+    image: ghcr.io/linuxserver/mariadb
+    container_name: mariadb
+    environment:
+      - PUID=${PUID?PUID is not known!}
+      - PGID=${PGID?PGID is not known!}
+      - TZ=${TIMEZONE?No timezone specified!}
+      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PW?Database root password is missing!}
+      - MYSQL_DATABASE=nextcloud
+      - MYSQL_USER=ncuser
+      - MYSQL_PASSWORD=${DB_NEXTCLOUD_PW?Database password for nextcloud user is missing!}
+    volumes:
+      - ${BASE_DIR?Base directory not specified!}/mariadb:/config
     restart: unless-stopped
