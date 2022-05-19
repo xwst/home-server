@@ -14,6 +14,12 @@ if [ -z $BASE_DIR ]; then
     BASE_DIR=$(pwd)
 fi
 
+if [ -d $BASE_DIR/mariadb ] || [ -d $BASE_DIR/nextcloud ]; then
+    echo "Script should only be used for first installation, but either nextcloud or mariadb seem to be already set up." | ww
+    echo "Aborting."
+    exit 1
+fi
+
 echo "The linuxserver.io-images require a user that will be the owner of the bind-mounted data within the docker containers. If you give a user name that does not exist, a new one will be created." | ww
 echo -n "User name: "
 read user;
@@ -89,4 +95,4 @@ chown $uid:$gid $NC_CONF
 
 echo "Configuration complete, stopping server." | ww
 docker-compose down
-echo "The database passwords have been generated automatically. You can find them in the './.env'-file." | ww
+echo "The database passwords have been generated automatically. You can find them in the './.env'-file. You may now start the services using docker-compose." | ww
