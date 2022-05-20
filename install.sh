@@ -53,6 +53,7 @@ cat /etc/timezone >> .env
 chmod 600 .env
 echo "DB_ROOT_PW=$(pw 20)" >> .env
 echo "DB_NEXTCLOUD_PW=$(pw 20)" >> .env
+echo "COLLABORA_ADMIN_PW=$(pw 20)" >> .env
 
 echo "Starting server to continue with configuration." | ww
 docker-compose up -d
@@ -67,9 +68,10 @@ done
 echo ""
 
 
-# Enable reverse proxy for nextcloud:
+# Enable reverse proxy for nextcloud and collabora:
 mv $BASE_DIR/swag/nginx/proxy-confs/nextcloud.subfolder.conf.sample \
    $BASE_DIR/swag/nginx/proxy-confs/nextcloud.subfolder.conf
+mv $BASE_DIR/collabora.subfolder.conf $BASE_DIR/swag/nginx/proxy-confs/
 docker-compose restart swag
 
 echo -n "Waiting for nextcloud to perform initial configuration." | ww
@@ -95,4 +97,4 @@ chown $uid:$gid $NC_CONF
 
 echo "Configuration complete, stopping server." | ww
 docker-compose down
-echo "The database passwords have been generated automatically. You can find them in the './.env'-file. You may now start the services using docker-compose." | ww
+echo "Various passwords have been generated automatically. You can find them in the './.env'-file. You may now start the services using docker-compose." | ww

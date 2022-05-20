@@ -48,3 +48,15 @@ services:
     volumes:
       - ${BASE_DIR?Base directory not specified!}/mariadb:/config
     restart: unless-stopped
+  collabora:
+    image: collabora/code
+    container_name: collabora
+    environment:
+      - aliasgroup1=https://${MYDOMAIN}:443
+      - username=admin
+      - password=${COLLABORA_ADMIN_PW?Collabora password not specified!}
+      - DONT_GEN_SSL_CERT=true
+      - server_name=${MYDOMAIN}
+      - dictionaries="de_DE en_GB en_US"
+      - "extra_params=--o:ssl.enable=false --o:ssl.termination=true --o:logging.level=error --o:net.service_root=/collabora"
+    restart: unless-stopped
