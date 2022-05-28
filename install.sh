@@ -20,6 +20,18 @@ if [ -d $BASE_DIR/mariadb ] || [ -d $BASE_DIR/nextcloud ]; then
     exit 1
 fi
 
+mkdir -p $BASE_DIR && cd $BASE_DIR
+if [ -d .git ]; then
+    echo "$BASE_DIR already contains a git repository. You should only continue, if this is the correct repository and working-tree." | ww
+    echo -n "Continue? [yN] "
+    read answer
+    if [ $answer != "Y" ] && [ $answer != "y" ]; then
+        exit 0;
+    fi
+else
+    git clone https://github.com/xwst/home-server.git
+fi
+
 echo "The linuxserver.io-images require a user that will be the owner of the bind-mounted data within the docker containers. If you give a user name that does not exist, a new one will be created." | ww
 echo -n "User name: "
 read user;
@@ -36,9 +48,6 @@ fi
 
 uid=$(id -u $user)
 gid=$(id -g $user)
-
-mkdir -p $BASE_DIR && cd $BASE_DIR
-git clone https://github.com/xwst/home-server.git
 chown -R $uid:$gid $BASE_DIR
 
 
