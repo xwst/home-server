@@ -106,4 +106,4 @@ chown $uid:$gid $NC_CONF
 
 echo "Configuration complete, stopping server." | ww
 docker-compose down
-echo "Various passwords have been generated automatically. You can find them in the './.env'-file. You may now start the services using docker-compose." | ww
+echo "Various passwords have been generated automatically. You can find them in the './.env'-file. You may now start the services using docker-compose. Do not forget to configure the ddclient by editing $BASE_DIR/ddclient/ddclient.conf." | ww

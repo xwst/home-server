@@ -1,6 +1,16 @@
 ---
 version: "2.1"
 services:
+  ddclient:
+    image: lscr.io/linuxserver/ddclient:latest
+    container_name: ddclient
+    environment:
+      - PUID=${PUID?PUID is not known!}
+      - PGID=${PGID?PGID is not known!}
+      - TZ=${TIMEZONE?No timezone specified!}
+    volumes:
+      - ${BASE_DIR?Base directory not specified!}/ddclient:/config
+    restart: unless-stopped
   swag:
     image: ghcr.io/linuxserver/swag
     container_name: swag
