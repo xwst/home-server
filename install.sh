@@ -60,9 +60,12 @@ echo "BASE_DIR=$BASE_DIR" > .env
 echo -en "PUID=$uid\nPGID=$gid\nMYDOMAIN=$domain\nTIMEZONE=" >> .env
 cat /etc/timezone >> .env
 chmod 600 .env
-echo "DB_ROOT_PW=$(pw 20)" >> .env
+DB_ROOT_PW=$(pw 20)
+GITEA_DB_PASSWORD=$(pw 20)
+echo "DB_ROOT_PW=$DB_ROOT_PW" >> .env
 echo "DB_NEXTCLOUD_PW=$(pw 20)" >> .env
 echo "COLLABORA_ADMIN_PW=$(pw 20)" >> .env
+echo "GITEA_DB_PASSWORD=$GITEA_DB_PASSWORD" >> .env
 
 echo "Starting server to continue with configuration." | ww
 docker-compose up -d
@@ -76,11 +79,13 @@ while [ ! -f "$PROXY_CONF.sample" ]; do
 done
 echo ""
 
-
-# Enable reverse proxy for nextcloud and collabora:
+# Enable reverse proxies:
 mv $BASE_DIR/swag/nginx/proxy-confs/nextcloud.subfolder.conf.sample \
    $BASE_DIR/swag/nginx/proxy-confs/nextcloud.subfolder.conf
-mv $BASE_DIR/collabora.subfolder.conf $BASE_DIR/swag/nginx/proxy-confs/
+cp $BASE_DIR/collabora.subfolder.conf \
+   $BASE_DIR/swag/nginx/proxy-confs/
+mv $BASE_DIR/swag/nginx/proxy-confs/gitea.subfolder.conf.sample \
+   $BASE_DIR/swag/nginx/proxy-confs/gitea.subfolder.conf
 docker-compose restart swag
 
 echo -n "Waiting for nextcloud to perform initial configuration." | ww
@@ -93,6 +98,10 @@ done
 echo ""
 sleep 5
 
+# Setup databases
+SQL_SCRIPT=$(sed "s/%GITEA_DB_PASSWORD%/$GITEA_DB_PASSWORD/" setup_db.sql)
+docker exec -it mariadb /bin/bash -c "echo \"$SQL_SCRIPT\" | mysql -u root -p\"$DB_ROOT_PW\""
+
 
 # Adjust nextcloud settings:
 grep -v "^$" $NC_CONF | head -n -1 > tmp.conf
@@ -102,6 +111,12 @@ echo "  'overwrite.cli.url' => 'https://$domain/nextcloud'" >> tmp.conf
 grep -v "^$" $NC_CONF | tail -n 1 >> tmp.conf
 mv tmp.conf $NC_CONF
 chown $uid:$gid $NC_CONF
+
+# Adjust gitea settings:
+sed -i -e "s#\[server\]#[server]\nROOT_URL                = https://$domain/gitea/\nDOMAIN                  = $domain#" \
+    -e 's/\(START_SSH_SERVER.*= \).*/\1false/' \
+    -e 's/\(DISABLE_SSH.*= \).*/\1true/' \
+    $BASE_DIR/gitea/conf/app.ini
 
 
 echo "Configuration complete, stopping server." | ww
