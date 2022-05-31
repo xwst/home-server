@@ -29,7 +29,7 @@ if [ -d .git ]; then
         exit 0;
     fi
 else
-    git clone https://github.com/xwst/home-server.git
+    git clone https://github.com/xwst/home-server.git .
 fi
 
 echo "The linuxserver.io-images require a user that will be the owner of the bind-mounted data within the docker containers. If you give a user name that does not exist, a new one will be created." | ww
