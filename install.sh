@@ -114,10 +114,12 @@ mv tmp.conf $NC_CONF
 chown $uid:$gid $NC_CONF
 
 # Adjust gitea settings:
+GITEA_CONFIG=$BASE_DIR/gitea/config/app.ini
+chmod og-rwx $GITEA_CONFIG
 sed -i -e "s#\[server\]#[server]\nROOT_URL                = https://$domain/gitea/\nDOMAIN                  = $domain#" \
     -e 's/\(START_SSH_SERVER.*= \).*/\1false/' \
     -e 's/\(DISABLE_SSH.*= \).*/\1true/' \
-    $BASE_DIR/gitea/config/app.ini
+    $GITEA_CONFIG
 
 
 echo "Configuration complete, stopping server." | ww
