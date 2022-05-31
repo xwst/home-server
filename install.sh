@@ -48,6 +48,7 @@ fi
 
 uid=$(id -u $user)
 gid=$(id -g $user)
+mkdir -p $BASE_DIR/gitea/config $BASE_DIR/gitea/data
 chown -R $uid:$gid $BASE_DIR
 
 
