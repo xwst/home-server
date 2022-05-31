@@ -5,7 +5,7 @@ function ww() {
     cat | fold -s -w $LINE_WIDTH
 }
 function pw() {
-    head -c $1 /dev/urandom | base64 -w 0 | head -c $1
+    head -c $1 /dev/urandom | base64 -w 0 | sed 's#/##g' | head -c $1
 }
 
 echo -n "Please enter the base directory in which all bind-mounts will be placed: ($(pwd))" | ww
