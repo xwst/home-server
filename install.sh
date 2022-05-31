@@ -117,7 +117,7 @@ chown $uid:$gid $NC_CONF
 sed -i -e "s#\[server\]#[server]\nROOT_URL                = https://$domain/gitea/\nDOMAIN                  = $domain#" \
     -e 's/\(START_SSH_SERVER.*= \).*/\1false/' \
     -e 's/\(DISABLE_SSH.*= \).*/\1true/' \
-    $BASE_DIR/gitea/conf/app.ini
+    $BASE_DIR/gitea/config/app.ini
 
 
 echo "Configuration complete, stopping server." | ww
