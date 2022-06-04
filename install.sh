@@ -116,7 +116,8 @@ chown $uid:$gid $NC_CONF
 # Adjust gitea settings:
 GITEA_CONFIG=$BASE_DIR/gitea/config/app.ini
 chmod og-rwx $GITEA_CONFIG
-sed -i -e "s#\[server\]#[server]\nROOT_URL                = https://$domain/gitea/\nDOMAIN                  = $domain#" \
+sed -i -e "s#\[server\]#[server]\nDOMAIN                  = $domain#" \
+    -e "s#\(ROOT_URL.*= \).*#\1https://$domain/gitea/#" \
     -e 's/\(START_SSH_SERVER.*= \).*/\1false/' \
     -e 's/\(DISABLE_SSH.*= \).*/\1true/' \
     $GITEA_CONFIG
