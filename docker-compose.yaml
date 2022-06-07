@@ -79,6 +79,8 @@ services:
       - ${BASE_DIR?Base directory not specified!}/gitea/config:/etc/gitea
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
+    depends_on:
+      - mariadb
     environment:
       - GITEA__database__DB_TYPE=mysql
       - GITEA__database__HOST=mariadb:3306
