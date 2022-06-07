@@ -24,7 +24,7 @@ services:
         # - SUBDOMAINS=www,
         # - EXTRA_DOMAINS=
       - VALIDATION=http
-      - STAGING=true  # change to 'false' for use in production
+      - STAGING=false
     volumes:
       - ${BASE_DIR?Base directory not specified!}/swag:/config
     ports:
